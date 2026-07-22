@@ -1,5 +1,7 @@
 # CRM REST API
 
+![CI](https://github.com/uttamchandak-dev/crm-rest-api/actions/workflows/ci.yml/badge.svg)
+
 A REST API for a lightweight CRM, built with **CodeIgniter 4** (PHP) and **MySQL**. Supports user auth, customers, and notes, with role-based access control: agents only see and manage the customers they own, while admins have full visibility.
 
 ## Features
@@ -87,6 +89,15 @@ curl -s -X POST $BASE/customers/1/notes -H "Authorization: Bearer $TOKEN" -H "Co
 ```
 
 Register a second user with `"role":"admin"` to see cross-agent visibility: an admin's `GET /api/customers` returns every customer, while an agent's only returns their own — a 404 (not a 403) is returned if an agent requests a customer they don't own, to avoid leaking which IDs exist.
+
+## Testing
+
+```bash
+composer install
+vendor/bin/phpunit
+```
+
+Feature tests (`tests/Feature/`) exercise the real HTTP routes end-to-end using CodeIgniter's `FeatureTestTrait`, backed by an in-memory SQLite database that's freshly migrated for each test class — no MySQL needed to run the suite locally or in CI. Coverage includes auth (register/login/duplicate email) and the RBAC rules on customers (ownership isolation, admin-only delete, 404-not-403 on cross-agent access).
 
 ## Design Notes
 
